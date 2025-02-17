@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histograma, Polígono de Frecuencia y Tabla</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f5f5f5; /* Fondo gris claro */
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            margin-bottom: 30px;
+        }
+        canvas {
+            max-width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 16px;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Histograma</h2>
+        <canvas id="histograma"></canvas>
+    </div>
+
+    <div class="container">
+        <h2>Polígono de Frecuencia</h2>
+        <canvas id="poligonoFrecuencia"></canvas>
+    </div>
+
+    <div class="container">
+        <h2>Tabla de Frecuencias</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Intervalo de Edad</th>
+                    <th>Frecuencia</th>
+                    <th>Punto Medio</th>
+                </tr>
+            </thead>
+            <tbody id="tablaFrecuencias">
+                <!-- Los datos de la tabla se llenarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p>Por Ashley Pérez 2024-0030</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Datos de edades
+            const edades = [3, 35, 36, 7, 31, 22, 34, 41, 5, 38, 34, 34, 26, 27, 32, 48, 
+                            24, 42, 29, 36, 20, 47, 35, 15, 28, 43, 25, 39, 11, 39, 28, 32, 
+                            33, 38, 17, 44, 13, 37, 38, 13];
+
+            // Definir intervalos de clases
+            const bins = [0, 10, 20, 30, 40, 50]; // Intervalos de edad
+            let frecuencias = Array(bins.length - 1).fill(0);
+            let puntosMedios = [];
+            let intervalos = [];
+
+            // Calcular puntos medios de los intervalos
+            for (let i = 0; i < bins.length - 1; i++) {
+                puntosMedios.push((bins[i] + bins[i + 1]) / 2);
+                intervalos.push(`${bins[i]} - ${bins[i + 1]}`);
+            }
+
+            // Contar la frecuencia en cada intervalo
+            edades.forEach(edad => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    if (edad >= bins[i] && edad < bins[i + 1]) {
+                        frecuencias[i]++;
+                        break;
+                    }
+                }
+            });
+
+            // Mostrar los datos en la tabla
+            let tablaHtml = '';
+            for (let i = 0; i < intervalos.length; i++) {
+                tablaHtml += `
+                    <tr>
+                        <td>${intervalos[i]}</td>
+                        <td>${frecuencias[i]}</td>
+                        <td>${puntosMedios[i]}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById('tablaFrecuencias').innerHTML = tablaHtml;
+
+            // Verificar si Chart.js está cargado correctamente
+            if (typeof Chart === "undefined") {
+                alert("Error: Chart.js no se ha cargado correctamente.");
+                return;
+            }
+
+            // Configuración del Histograma
+            const ctxHistograma = document.getElementById('histograma').getContext('2d');
+            new Chart(ctxHistograma, {
+                type: 'bar',
+                data: {
+                    labels: puntosMedios,
+                    datasets: [{
+                        label: 'Frecuencia',
+                        data: frecuencias,
+                        backgroundColor: 'rgba(0, 123, 255, 0.6)', // Azul con transparencia
+                        borderColor: 'blue',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { title: { display: true, text: 'Puntos Medios de los Intervalos' } }
+                    }
+                }
+            });
+
+            // Configuración del Polígono de Frecuencia
+            const ctxPoligono = document.getElementById('poligonoFrecuencia').getContext('2d');
+            new Chart(ctxPoligono, {
+                type: 'line',
+                data: {
+                    labels: puntosMedios,
+                    datasets: [{
+                        label: 'Frecuencia',
+                        data: frecuencias,
+                        borderColor: 'red',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'red',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { title: { display: true, text: 'Puntos Medios de los Intervalos' } }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+
+scobydoopapa1
